@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<title>Chat Room</title>
+<script type="text/javascript" src="http://ajax.aspnetcdn.com/ajax/jQuery/jquery-1.11.1.min.js"></script>
+<script type="text/javascript">
+function polling () {
+	$.ajax({
+		url: 'http://localhost:8888/get',
+		dataType: 'jsonp',
+		jsonpCallback: "pollingRecv",
+		timeout: 60*1000,
+		complete: function(){
+			polling();
+		}
+	});
+}
+
+function pollingRecv(dat){
+	document.getElementById('msgs').innerHTML += "<div>["+ dat.sender +"]: "+ dat.msg +"</div>";
+}
+
+function send(){
+	$.ajax({
+		url: 'http://localhost:8888/send',
+		data: $("form").serializeArray(),
+		dataType: 'jsonp',
+		complete: function(){
+			document.getElementById("textBox").value = "";
+		}
+	});
+}
+
+polling();
+</script>
+</head>
+
+<body>
+<div id="msgs" style="border:2px solid black; height:300px; overflow:auto;"></div>
+<form accept-charset="utf-8">
+	Name:<input type="text" name="name" />
+	Msg:<input type="text" name="msg" id="textBox" />
+</form>
+<input type="button" value="Send" onclick="send();" />
+</body>
+</html>
