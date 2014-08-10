@@ -1,5 +1,6 @@
 var qs = require("querystring"),
-	url = require("url");
+	url = require("url"),
+	net = require("net");
 
 var pollings = [];
 
@@ -21,5 +22,14 @@ function send(res, req){
 	res.end();
 }
 
+function notifySysMsg(dat){
+	for(var lp; lp = pollings.shift();){
+		lp.res.writeHead(200, {"Content-Type": "application/json-p"});
+		lp.res.write(lp.cb +"("+ JSON.stringify({"msg":dat.msg, "sender":"System"}) +")");
+		lp.res.end();
+	}
+}
+
 exports.get = get;
 exports.send = send;
+exports.notifySysMsg = notifySysMsg;
